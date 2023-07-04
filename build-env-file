@@ -1,0 +1,33 @@
+#!/bin/bash
+
+build()
+{
+    env=$1
+
+    cat /dev/null > ./.env.$env.local.dist
+    cat /dev/null > ./.env.$env.generated.dist
+
+    cp -n ./.env.$env.dist ./.env.$env.local
+
+    for ENV_DIST in $(find ./docker/common ./docker/$env ./make/common ./make/$env -name ".env.dist")
+    do
+      cat ${ENV_DIST} >> ./.env.$env.generated.dist
+    done
+
+    for variable in $(cut -d= -f1 ./.env.$env.generated.dist ./.env.$env.local | sort | uniq)
+    do
+      (grep ^${variable}= ./.env.$env.local || grep ^${variable}= ./.env.$env.generated.dist) >> ./.env.$env.local.dist
+    done
+
+    if [ -s ./.env.$env.local.dist ]; then
+      cat ./.env.$env.local.dist > ./.env.$env.local
+    fi
+
+    rm ./.env.$env.local.dist
+    rm ./.env.$env.generated.dist
+}
+
+build 'dev'
+build 'stage'
+
+exit 0

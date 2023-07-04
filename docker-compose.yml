@@ -1,0 +1,148 @@
+version: "3.7"
+
+x-php-config: &php-config
+    environment:
+        APP_DIR: ${APP_DIR}
+        APP_ENV: ${APP_ENV}
+        APP_DEBUG: ${APP_DEBUG}
+        APP_SECRET: ${APP_SECRET}
+        XDEBUG_MODE: ${XDEBUG_MODE}
+        PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
+        DB_VERSION: ${POSTGRES_VERSION}
+        DB_HOST: ${POSTGRES_HOST}
+        DB_USER: ${POSTGRES_USER}
+        DB_PASSWORD: ${POSTGRES_PASSWORD}
+        DB_NAME: ${POSTGRES_DB}
+        MAILER_FROM_APP_EMAIL: ${MAILER_FROM_APP_EMAIL}
+        MAILER_DSN: ${MAILER_DSN}
+        MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@${RABBITMQ_HOST}:5672"
+    depends_on: [ postgres ]
+    networks: [ internal ]
+    dns: [ 8.8.4.4, 8.8.8.8 ]
+
+services:
+    nginx:
+        build:
+            context: ./docker
+            dockerfile: dev/nginx/nginx.dockerfile
+            args:
+                nginx_image: ${NGINX_IMAGE}
+        environment:
+            APP_DIR: ${APP_DIR}
+        depends_on: [ postgres, php-fpm ]
+        networks: [ internal ]
+        ports: [ "${HTTP_PORT}:80" ]
+        volumes:
+            - ./docker/common/nginx/templates:/etc/nginx/templates:ro
+            - ./docker/common/nginx/modules-enabled:/etc/nginx/modules-enabled:ro
+            - ./docker/common/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./app:${APP_DIR}:cached
+
+    postgres:
+        build:
+            context: ./docker
+            dockerfile: dev/postgres/postgres.dockerfile
+            args:
+                postgres_image: ${POSTGRES_IMAGE}
+        environment:
+            POSTGRES_VERSION: ${POSTGRES_VERSION}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        networks: [ internal ]
+        ports: [ "${POSTGRES_PORT}:5432" ]
+        healthcheck:
+            test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    php-fpm:
+        build:
+            context: ./docker
+            dockerfile: dev/php-fpm/php-fpm.dockerfile
+            args:
+                php_fpm_image: ${PHP_FPM_IMAGE}
+                app_dir: ${APP_DIR}
+                user: ${USER}
+                uid: ${UID}
+        <<: *php-config
+        volumes:
+            - ./app:${APP_DIR}:rw
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
+    consumer:
+        build:
+            context: ./docker
+            dockerfile: dev/consumer/consumer.dockerfile
+            args:
+                php_cli_image: ${PHP_CLI_IMAGE}
+                app_dir: ${APP_DIR}
+                user: ${USER}
+                uid: ${UID}
+        <<: *php-config
+        volumes:
+            - ./app:${APP_DIR}:rw
+
+    cron:
+        build:
+            context: ./docker
+            dockerfile: dev/cron/cron.dockerfile
+            args:
+                php_fpm_image: ${PHP_FPM_IMAGE}
+                app_dir: ${APP_DIR}
+        <<: *php-config
+        volumes:
+            - ./docker/common/cron/periodic:/etc/periodic:ro
+            - ./docker/common/cron/startup.sh:/usr/local/startup.sh:ro
+            - ./app:${APP_DIR}:cached
+        command: /usr/local/startup.sh
+
+    memcached:
+        build:
+            context: ./docker
+            dockerfile: dev/memcached/memcached.dockerfile
+            args:
+                memcached_image: ${MEMCACHED_IMAGE}
+        networks: [ internal ]
+        ports: [ "${MEMCACHED_PORT}:11211" ]
+        command: '-m 512'
+
+    php-cli:
+        build:
+            context: ./docker
+            dockerfile: dev/php-cli/php-cli.dockerfile
+            args:
+                php_cli_image: ${PHP_CLI_IMAGE}
+                app_dir: ${APP_DIR}
+                user: ${USER}
+                uid: ${UID}
+        <<: *php-config
+        volumes:
+            - ./app:${APP_DIR}:rw
+
+    mailer:
+        build:
+            context: ./docker
+            dockerfile: dev/mailer/mailer.dockerfile
+            args:
+                mailer_image: ${MAILER_IMAGE:-mailhog/mailhog}
+        networks: [ internal ]
+        ports: [ "${MAILER_PORT:-1025}:1025", "${MAILER_HTTP_PORT:-8025}:8025" ]
+
+    rabbitmq:
+        build:
+            context: ./docker
+            dockerfile: dev/rabbitmq/rabbit.dockerfile
+            args:
+                rabbitmq_image: ${RABBITMQ_IMAGE}
+        environment:
+            RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST}
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+        networks: [ internal ]
+        ports: [ "${RABBITMQ_PORT}:5672", "${RABBITMQ_MANAGE_PORT}:15672" ]
+
+networks:
+    internal:
