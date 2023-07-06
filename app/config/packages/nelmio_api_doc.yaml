@@ -1,0 +1,86 @@
+nelmio_api_doc:
+  areas:
+    default:
+      # host_patterns: ^api\.
+      path_patterns: # an array of regexps
+        - ^/api(?!/doc$)(?!/doc.json$)/v\d+
+      documentation:
+        openapi: "3.0.0"
+        info:
+          title: Документация к api
+          version: v1
+          description: |
+            Hello Nelmio api doc world.
+  models:
+    use_jms: false
+    names:
+      - { alias: paginator_meta, type: App\Controller\Attributess\Response\PaginatorMeta }
+
+  documentation:
+    security:
+      - Bearer: []
+
+    components:
+      securitySchemes:
+        Bearer:
+          type: apiKey
+          description: 'Value: Bearer {jwt}'
+          name: Authorization
+          in: header
+      schemas:
+        empty_response:
+          type: object
+          required: [data, meta, error]
+          properties:
+            data:
+              type: object
+            meta:
+              type: object
+            error:
+              type: array
+              items:
+                type: string
+
+      parameters:
+        is_debug:
+          in: query
+          name: debug
+          description: "Параметр для режима debug"
+          schema:
+            type: boolean
+          required: false
+        ###> PAGINATOR ###
+        page:
+          in: query
+          name: page
+          description: "Номер страницы"
+          schema:
+            type: integer
+            default: 1
+          required: false
+        limit:
+          in: query
+          name: limit
+          description: "Количество на странице"
+          schema:
+            type: integer
+            default: 15
+          required: false
+
+        ###> ORDER BY ###
+        order[created_at]:
+          in: query
+          name: "order[created_at]"
+          description: 'Дата создания'
+          schema:
+            type: string
+            enum: [ asc,desc ]
+          required: false
+        order[sort]:
+          in: query
+          name: "order[sort]"
+          description: 'Сортировка'
+          schema:
+            type: string
+            enum: [ asc,desc ]
+          required: false
