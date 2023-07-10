@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Doctrine\Dbal\Filter\Query;
 
-use App\DTO\AbstractCommand;
+use App\Dto\AbstractCommand;
 use App\Exception\InvalidTypeException;
 use Webmozart\Assert\Assert;
 

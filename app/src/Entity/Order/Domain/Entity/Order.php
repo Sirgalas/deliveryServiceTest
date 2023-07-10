@@ -35,7 +35,7 @@ class Order
         enumType: Status::class,
         options: ['comment' => 'Статус.', 'default' => 'taken']
     )]
-    private Status $status;
+    private Status $status ;
 
     #[ORM\Column(
         name: 'date_start_order',
@@ -60,8 +60,13 @@ class Order
     ]
     private Address $address;
 
-    public function __construct(Uuid $id, Status $status, \DateTime $dateStartOrder, ?\DateTime $dateDelivery, Address $address)
-    {
+    public function __construct(
+        Uuid $id,
+        Status $status,
+        \DateTime $dateStartOrder,
+        Address $address,
+        ?\DateTime $dateDelivery = null
+    ) {
         $this->id = $id;
         $this->status = $status;
         $this->dateStartOrder = $dateStartOrder;

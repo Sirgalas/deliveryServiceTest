@@ -6,6 +6,7 @@ namespace App\Entity\Address\Domain\Entity;
 
 
 use App\Doctrine\Dbal\Type\Types;
+use App\Doctrine\ORM\Contracts\Identity;
 use App\Entity\Address\Domain\Orm\Type\TypeStreet;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
@@ -20,7 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\FileLoader;
         options:['comment' => 'Адресс']
     ),
 ]
-class Address
+class Address implements Identity
 {
     final public const TABLE_NAME = 'address';
 
@@ -58,35 +59,63 @@ class Address
         enumType: TypeStreet::class,
         options: ['comment' => 'Тип улицы.', 'default' => 'street']
     )]
-    private TypeStreet $status;
+    private TypeStreet $typeStreet;
 
-    #[ORM\Column(name: 'home', type: Types::STRING, nullable: true, options: ['comment' => 'Дом.'])]
+    #[ORM\Column(
+        name: 'home',
+        type: Types::STRING,
+        nullable: true,
+        options: ['comment' => 'Дом.'])
+    ]
     private string $home;
 
-    #[ORM\Column(name: 'building', type: Types::STRING, nullable: true, options: ['comment' => 'Корпус.'])]
+    #[ORM\Column(
+        name: 'building',
+        type: Types::STRING,
+        nullable: true,
+        options: ['comment' => 'Корпус.'])
+    ]
     private ?string $building = null;
 
-    #[ORM\Column(name: 'flat', type: Types::SMALLINT, nullable: true, options: ['comment' => 'Квартира.'])]
+    #[ORM\Column(
+        name: 'flat',
+        type: Types::SMALLINT,
+        nullable: true,
+        options: ['comment' => 'Квартира.'])
+    ]
     private string $flat;
 
     public function __construct(
+        Uuid $id,
         string $city,
         ?string $village,
         string $street,
-        TypeStreet $status,
+        TypeStreet $typeStreet,
         string $home,
         ?string $building,
         string $flat
     ) {
+        $this->id = $id;
         $this->city = $city;
         $this->village = $village;
         $this->street = $street;
-        $this->status = $status;
+        $this->typeStreet = $typeStreet;
         $this->home = $home;
         $this->building = $building;
         $this->flat = $flat;
     }
 
+
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
+
+    public function setId(Uuid $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     public function getCity(): ?string
     {
@@ -165,7 +194,13 @@ class Address
         return $this;
     }
 
+    public function getTypeStreet(): TypeStreet
+    {
+        return $this->typeStreet;
+    }
 
-
-
+    public function setTypeStreet(TypeStreet $typeStreet): void
+    {
+        $this->typeStreet = $typeStreet;
+    }
 }

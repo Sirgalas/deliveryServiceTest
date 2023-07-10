@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Attributess\Response;
+namespace App\Controller\Attributes\Response;
 
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;

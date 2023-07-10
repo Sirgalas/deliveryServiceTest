@@ -14,7 +14,7 @@ nelmio_api_doc:
   models:
     use_jms: false
     names:
-      - { alias: paginator_meta, type: App\Controller\Attributess\Response\PaginatorMeta }
+      - { alias: paginator_meta, type: App\Controller\Attributes\Response\PaginatorMeta }
 
   documentation:
     security:

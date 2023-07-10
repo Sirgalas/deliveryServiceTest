@@ -1,7 +1,7 @@
 composer-install:
 	docker-compose run --rm php-cli composer install
 
-composer-cache-cler:
+composer-cache-clear:
 	docker-compose run --rm php-cli composer clear-cache --no-interaction --no-cache
 
 composer-update:

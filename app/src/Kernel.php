@@ -23,6 +23,7 @@ class Kernel extends BaseKernel
         // Global configuration.
         $this->configureGlobalContainer($container, $loader, $builder, "{$appDir}/config");
         // App configuration.
+        $container->import("{$appDir}/src/**/Resources/config/config.php", null, true);
         $container->import("{$appDir}/src/Entity/**/Resources/config/config.php", null, true);
   }
 

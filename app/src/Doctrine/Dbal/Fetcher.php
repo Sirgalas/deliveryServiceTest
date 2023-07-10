@@ -17,16 +17,16 @@ use Webmozart\Assert\Assert;
 class Fetcher
 {
     protected Connection $connection;
-    private readonly Filter $filter;
+    //private readonly Filter $filter;
     private readonly PaginatorInterface $paginator;
 
     public function __construct(
         Connection $connection,
         PaginatorInterface $paginator,
-        Cache $cacher,
+        //Cache $cacher,
     ) {
         $this->connection = $connection;
-        $this->filter = new Filter($connection, $cacher);
+       // $this->filter = new Filter($connection, $cacher);
         $this->paginator = $paginator;
     }
 
@@ -48,10 +48,10 @@ class Fetcher
             ->fetchOne();
     }
 
-    final public function getFilter(): Filter
+    /*final public function getFilter(): Filter
     {
         return $this->filter;
-    }
+    }*/
 
     final public function isExistTable(string $tableName): bool
     {

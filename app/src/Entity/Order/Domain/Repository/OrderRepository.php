@@ -6,6 +6,7 @@ namespace App\Entity\Order\Domain\Repository;
 
 use App\Doctrine\ORM\AbstractRepository;
 use App\Entity\Order\Domain\Entity\Order;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @extends AbstractRepository<Order>
@@ -19,5 +20,8 @@ use App\Entity\Order\Domain\Entity\Order;
  */
 class OrderRepository extends AbstractRepository
 {
-
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em, Order::class);
+    }
 }
