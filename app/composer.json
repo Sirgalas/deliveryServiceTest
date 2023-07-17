@@ -76,6 +76,7 @@
     },
     "autoload": {
         "psr-4": {
+            "App\\Framework\\": "framework/",
             "App\\": "src/"
         }
     },

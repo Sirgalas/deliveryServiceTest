@@ -1,0 +1,9 @@
+parameters:
+
+services:
+  App\Framework\Controller\Presenter\Presenter:
+    public: true
+    calls:
+      - [ setContainer, [ "@service_container" ] ]
+  App\Framework\Controller\AbstractController:
+    tags: [ controller.service_arguments ]
