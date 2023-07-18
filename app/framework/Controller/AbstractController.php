@@ -7,7 +7,7 @@ namespace App\Framework\Controller;
 use App\Framework\Controller\Presenter\Presenter;
 use App\Framework\Dto\AbstractCommand;
 use App\Framework\Security\View\UserIdentity;
-use App\Framework\Security\Validator\Framework\Problem\ValidationProblem;
+use App\Framework\Validator\Problem\ValidationProblem;
 use Dompdf\Dompdf;
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPaginationInterface;
 use Knp\Component\Pager\Pagination\PaginationInterface;

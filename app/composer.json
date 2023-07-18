@@ -104,7 +104,8 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "rector": "vendor/bin/rector process"
     },
     "conflict": {
         "symfony/symfony": "*"

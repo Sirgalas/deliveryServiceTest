@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Framework\Security\Validator\Framework\Problem;
+namespace App\Framework\Validator\Problem;
 
 use Phpro\ApiProblem\Http\HttpApiProblem;
 use Symfony\Component\Validator\ConstraintViolationListInterface;

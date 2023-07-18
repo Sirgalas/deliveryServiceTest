@@ -51,6 +51,7 @@ class Controller extends AbstractController
     public function __invoke(Request $request, Handler $handler): JsonResponse
     {
         $command = new Command($request->request->all());
+        $this->validate($command);
         return $this->json(['id' => $handler->handle($command)->getId()->toRfc4122()]);
     }
 }

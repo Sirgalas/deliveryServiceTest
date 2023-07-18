@@ -1,6 +1,20 @@
 parameters:
 
 services:
+  # _default is never inherited, it applies only to the current file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+  App\Framework\Controller\Route\TargetResource\Subscriber\:
+    resource: '%kernel.project_dir%/framework/Controller/Route/TargetResource/Subscriber'
+    tags:
+      - { name: kernel.event_subscriber }
+
+  App\Framework\Controller\Event\Subscriber\:
+    resource: '%kernel.project_dir%/framework/Controller/Event/Subscriber'
+    tags:
+      - { name: kernel.event_subscriber }
   App\Framework\Controller\Presenter\Presenter:
     public: true
     calls:
